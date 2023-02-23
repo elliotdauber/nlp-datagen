@@ -29,10 +29,18 @@ df_dedup['Lyric'] = df_dedup['Lyric'].astype(str).apply(lambda x: re.sub("\[.*?\
 genre_df = df_dedup['Genres'].str.split(";", expand=True)
 genre_df = genre_df.rename(columns = lambda x : f"Genre{x}")
 df_split = pd.concat([df_dedup.drop(['Genres'], axis=1), genre_df], axis=1)
+df_split = df_split.drop('Genre1', axis=1)
+df_split = df_split.drop('Genre2', axis=1)
+df_split = df_split.drop('Genre3', axis=1)
+df_split = df_split.rename(columns={'Genre0': 'Genre'})
+
+genres = ["Rap", "Heavy Metal", "Country", "Gospel/Religioso"]
+df_split = df_split.loc[(df_split['Genre'].isin(genres))]
+df_split = df_split.dropna()
 
 unique_cols(df_split)
 
-value_counts = df_split['Genre0'].value_counts().head(20)
+value_counts = df_split['Genre'].value_counts().head(20)
 print(value_counts)
 
 df_split.to_csv('data/clean-data.csv', index=False)
