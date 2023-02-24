@@ -3,11 +3,13 @@ import torch
 from sklearn.model_selection import train_test_split
 from transformers import BertTokenizer, BertForSequenceClassification, AdamW
 
+NUM_LABELS = 4
+
 # Load the pre-trained BERT model and tokenizer
 model_name = 'bert-base-uncased'
 tokenizer = BertTokenizer.from_pretrained(model_name)
 print("after tokenizer")
-model = BertForSequenceClassification.from_pretrained(model_name, num_labels=5)
+model = BertForSequenceClassification.from_pretrained(model_name, num_labels=NUM_LABELS)
 print("after model")
 
 
@@ -16,6 +18,10 @@ print("after model")
 data = pd.read_csv('data/clean-data.csv')
 data['Genre'] = data['Genre'].astype('category')
 print(data['Lyric'].dtype)
+
+data = data.groupby('Genre').head(128)
+print(data.shape[0])
+
 
 # Tokenize the lyrics using the BERT tokenizer
 encoded_data = tokenizer.batch_encode_plus(
@@ -34,10 +40,15 @@ attention_masks = encoded_data['attention_mask']
 labels = torch.tensor(data.Genre.cat.codes.values)
 
 batch_size, seq_length = input_ids.size()
-num_batches = batch_size // 512
-input_ids = input_ids.narrow(0, 0, num_batches * 512).view(-1, 512)
-attention_masks = attention_masks.narrow(0, 0, num_batches * 512).view(-1, 512)
+print(input_ids.shape)
 
+divisor = 512
+num_batches = batch_size // divisor
+print(num_batches)
+input_ids = input_ids.narrow(0, 0, num_batches * divisor).view(-1, divisor)
+attention_masks = attention_masks.narrow(0, 0, num_batches * divisor).view(-1, divisor)
+print(input_ids.shape)
+print(attention_masks.shape)
 
 
 # Split the data into training and validation sets
@@ -50,7 +61,7 @@ train_masks, validation_masks, _, _ = train_test_split(attention_masks[:num_samp
 # Define the fine-tuning model architecture
 model = BertForSequenceClassification.from_pretrained(
     model_name,
-    num_labels=5,
+    num_labels=NUM_LABELS,
     output_attentions=False,
     output_hidden_states=False,
 )
@@ -65,9 +76,14 @@ for epoch in range(epochs):
     print("in epoch", epoch)
     model.train()
     train_loss = 0
+    print(len(train_inputs))
     for batch in range(len(train_inputs)):
         optimizer.zero_grad()
-        outputs = model(train_inputs[batch], token_type_ids=None, attention_mask=train_masks[batch],
+        print(batch)
+        print(train_inputs.shape)
+        print(train_masks.shape)
+        print(train_labels.shape)
+        outputs = model(train_inputs[batch].resize(1, 512), token_type_ids=None, attention_mask=train_masks[batch].resize(1, 512),
                         labels=train_labels[batch])
         loss = outputs[0]
         train_loss += loss.item()
