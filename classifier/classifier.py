@@ -63,9 +63,6 @@ def segment_dataset(dataset):
     )
 
 def train_classifier(dataset):
-    print("In total, there are", len(dataset), "examples")
-    dataset = sample_from_dataset(dataset, 1000)
-    print("After sampling, there are", len(dataset), "examples")
     split_dataset = segment_dataset(dataset)
     print(split_dataset)
 
