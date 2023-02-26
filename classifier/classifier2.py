@@ -5,7 +5,7 @@ from transformers import BertTokenizer, BertForSequenceClassification, AdamW
 
 # Set the number of labels and the device to be used
 NUM_LABELS = 4
-BATCH_SIZE = 2
+BATCH_SIZE = 25
 device = torch.cuda.current_device() if torch.cuda.is_available() else 'cpu'
 
 # Load the pre-trained BERT model and tokenizer
@@ -16,7 +16,7 @@ model = BertForSequenceClassification.from_pretrained(model_name, num_labels=NUM
 # Load the labeled song lyric CSV file
 data = pd.read_csv('data/clean-data.csv')
 data['Genre'] = data['Genre'].astype('category')
-data = data.groupby('Genre').head(128)
+data = data.groupby('Genre').head(1000)
 print("encoding data...")
 # Tokenize the lyrics using the BERT tokenizer
 encoded_data = tokenizer.batch_encode_plus(
@@ -36,8 +36,8 @@ attention_masks = encoded_data['attention_mask']
 labels = torch.tensor(data.Genre.cat.codes.values)
 
 # Split the data into training and validation sets
-train_inputs, validation_inputs, train_labels, validation_labels = train_test_split(input_ids, labels, random_state=42, test_size=0.25)
-train_masks, validation_masks, _, _ = train_test_split(attention_masks, input_ids, random_state=42, test_size=0.25)
+train_inputs, validation_inputs, train_labels, validation_labels = train_test_split(input_ids, labels, random_state=42, test_size=0.1)
+train_masks, validation_masks, _, _ = train_test_split(attention_masks, input_ids, random_state=42, test_size=0.1)
 print("split the dataset...")
 print(train_inputs.shape)
 
@@ -56,7 +56,7 @@ print("dataloader done...")
 # Set up the optimizer and training loop
 optimizer = AdamW(model.parameters(), lr=2e-5, eps=1e-8)
 
-epochs = 4
+epochs = 20
 
 for epoch in range(epochs):
     print("in epoch", epoch)

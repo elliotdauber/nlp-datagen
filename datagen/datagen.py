@@ -2,6 +2,7 @@ import openai
 import yaml
 import pandas as pd
 import os.path
+from random import randrange
 
 # api ref: https://platform.openai.com/docs/api-reference/edits/create
 def ask_davinci(question):
@@ -18,16 +19,16 @@ def ask_davinci(question):
     response = openai.Completion.create(
         engine="text-davinci-003",
         prompt=prompt,
-        max_tokens=1024,
-        n=1,
+        max_tokens=randrange(750, 1024),
+        n=10,
         stop=None,
-        temperature=0.5,
+        temperature=0.9,
     )
     
     # Get the response text
-    response_text = response["choices"][0]["text"]
+    responses = [r["text"] for r in response["choices"]]
     
-    return response_text
+    return responses
 
 def generate_song(genre):
     question = "Write a new song in the " + genre + " genre that you haven't generated before. Ensure that the text you generate has no commas in it."
@@ -41,13 +42,17 @@ def generate_songs(genre, num_songs, outfile):
         # If file does not exist, create a new dataframe
         df = pd.DataFrame(columns=['Lyric', 'Genre'])
 
+    print(df)
     for i in range(num_songs):
-        lyrics = generate_song(genre)
-        df = df.append([lyrics, genre])
+        responses = generate_song(genre)
+        print("generated number", i)
+        for r in responses:
+            new_df = {'Lyric': r, 'Genre': genre}
+            df = df.append(new_df, ignore_index = True)
 
     # Write the dataframe to a file
     df.to_csv(outfile, index=False)
 
-generate_songs("rock", 2, "generated_data/rock.csv")
+generate_songs("Rap", 4, "generated_data/rap.csv")
 
 
