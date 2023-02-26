@@ -1,4 +1,4 @@
-datagen/__pycache__
+**__pycache__
 datagen/secrets.yaml
 data/*.csv
 **.DS_Store

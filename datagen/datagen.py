@@ -40,19 +40,19 @@ def generate_songs(genre, num_songs, outfile):
         df = pd.read_csv(outfile)
     else:
         # If file does not exist, create a new dataframe
-        df = pd.DataFrame(columns=['Lyric', 'Genre'])
+        df = pd.DataFrame(columns=['lyrics', 'genre'])
 
     print(df)
     for i in range(num_songs):
         responses = generate_song(genre)
         print("generated number", i)
         for r in responses:
-            new_df = {'Lyric': r, 'Genre': genre}
+            new_df = {'lyrics': r, 'genre': genre}
             df = df.append(new_df, ignore_index = True)
 
     # Write the dataframe to a file
     df.to_csv(outfile, index=False)
 
-generate_songs("Rap", 4, "generated_data/rap.csv")
+generate_songs("rap", 4, "generated_data/rap.csv")
 
 
