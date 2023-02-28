@@ -3,7 +3,7 @@ from transformers import AutoTokenizer, TrainingArguments, Trainer, DistilBertFo
 from sklearn.model_selection import train_test_split
 from torch.utils.data import TensorDataset, DataLoader, RandomSampler, SequentialSampler
 import ast
-import np
+import numpy as np
 import torch
 import pandas as pd
 
@@ -14,6 +14,13 @@ GENRE_ENCODINGS = {
     "country": 1,
     "rap": 2,
     "metal": 3
+}
+
+GENRE_DECODINGS = {
+    0: "gospel",
+    1: "country",
+    2: "rap",
+    3: "metal"
 }
 
 def get_genre_encoding(genre):

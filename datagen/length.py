@@ -1,4 +1,6 @@
 import pandas as pd
+import sys
 
-df = pandas.read_csv('generated_data/gospel.csv')
-print(len(df.index))
+if __name__ == "__main__":
+    df = pd.read_csv(sys.argv[1])
+    print(len(df.index))
