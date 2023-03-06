@@ -81,7 +81,7 @@ def generate_songs_based_on_others(n_per, genre_to_generate=None):
             for index, row in group.iterrows():
                 lyrics = row['lyrics']
                 question = "Write a song in the " + genre + " genre, that is written in the same style as this song: \n" + lyrics
-                responses = ask_davinci(question)
+                responses = ask_davinci(question, 2)
                 for r in responses:
                     new_df = {'lyrics': r, 'genre': genre}
                     df = df.append(new_df, ignore_index = True)
