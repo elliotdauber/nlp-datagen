@@ -62,6 +62,13 @@ def sample_from_dataset(dataset, n_per_genre):
     sampled_data = dataset.to_pandas().groupby('genre').head(n_per_genre)
     return Dataset.from_pandas(sampled_data)
 
+def sample_from_dataset(dataset, genre, num_examples):
+    # sample n_per_genre rows
+    sampled_data = dataset.to_pandas()
+    sampled_data = sampled_data[sampled_data['genre'] == GENRE_ENCODINGS['metal']]
+    sampled_data = sampled_data.sample(n=min(num_examples, len(sampled_data)))
+    return Dataset.from_pandas(sampled_data)
+
 def segment_dataset(dataset):
     train_end = int(len(dataset) * 0.9)
     return DatasetDict(
@@ -69,7 +76,7 @@ def segment_dataset(dataset):
         val=dataset.shuffle(seed=1111).select(range(train_end + 1, len(dataset))).map(clean)
     )
 
-def train_classifier(dataset):
+def train_classifier(dataset, model_name):
     split_dataset = segment_dataset(dataset)
     print(split_dataset)
 
@@ -114,5 +121,8 @@ def train_classifier(dataset):
     )
 
     trainer.train()
+
+    model.save_pretrained("models/" + model_name)
+
     results = trainer.predict(split_tokenized_dataset['val'])
     print(results)
