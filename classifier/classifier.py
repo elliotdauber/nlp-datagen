@@ -91,7 +91,7 @@ def train_classifier(dataset, model_name):
     )
 
     arguments = TrainingArguments(
-        output_dir="trainer_output",
+        output_dir="models/" + model_name + "/trainer_output",
         per_device_train_batch_size=64,
         per_device_eval_batch_size=64,
         num_train_epochs=10,

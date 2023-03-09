@@ -3,3 +3,4 @@ datagen/secrets.yaml
 data/*.csv
 **.DS_Store
 trainer_output
+classifier/models
