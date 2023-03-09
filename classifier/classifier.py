@@ -65,7 +65,7 @@ def sample_from_dataset(dataset, n_per_genre):
 def sample_from_dataset(dataset, genre, num_examples):
     # sample n_per_genre rows
     sampled_data = dataset.to_pandas()
-    sampled_data = sampled_data[sampled_data['genre'] == GENRE_ENCODINGS['metal']]
+    sampled_data = sampled_data[sampled_data['genre'] == GENRE_ENCODINGS[genre]]
     sampled_data = sampled_data.sample(n=min(num_examples, len(sampled_data)))
     return Dataset.from_pandas(sampled_data)
 
@@ -97,7 +97,7 @@ def train_classifier(dataset, model_name):
         num_train_epochs=10,
         evaluation_strategy="epoch", # run validation at the end of each epoch
         save_strategy="epoch",
-        learning_rate=2e-5,
+        learning_rate=5e-5,
         load_best_model_at_end=True,
         seed=224
     )
@@ -115,7 +115,7 @@ def train_classifier(dataset, model_name):
         model=model,
         args=arguments,
         train_dataset=split_tokenized_dataset['train'],
-        eval_dataset=split_tokenized_dataset['val'], # change to test when you do your final evaluation!
+        eval_dataset=split_tokenized_dataset['val'],
         tokenizer=tokenizer,
         compute_metrics=compute_metrics
     )
