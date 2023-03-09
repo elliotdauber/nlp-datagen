@@ -2,6 +2,7 @@ from classifier import train_classifier, get_vanilla_dataset, sample_from_datase
 from datasets import Dataset, concatenate_datasets
 from experiments import EXPERIMENTS
 import pandas as pd
+import sys
 
 def augment_dataset(dataset, filenames):
     dataset_df = dataset.to_pandas()
@@ -47,7 +48,7 @@ if __name__ == "__main__":
                     combined_dataset = concatenate_datasets([combined_dataset, sub_dataset])
             
             print("training classifier for experiment " + e.name)
-            train_classifier(dataset, e.name)
+            train_classifier(combined_dataset, e.name)
             print("successfully trained classifier for experiment " + e.name)
 
 
