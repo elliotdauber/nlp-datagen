@@ -78,17 +78,19 @@ def segment_dataset(dataset):
 
 def train_classifier(dataset, model_name):
     split_dataset = segment_dataset(dataset)
-    print(split_dataset)
 
     tokenizer = AutoTokenizer.from_pretrained('distilbert-base-cased')
     model = DistilBertForSequenceClassification.from_pretrained('distilbert-base-cased', num_labels=len(GENRE_ENCODINGS)).to(device)
 
+    print(split_dataset["train"].features['text'].dtype)
     # Prepare the dataset - this tokenizes the dataset in batches of 64 examples.
     split_tokenized_dataset = split_dataset.map(
         lambda example: tokenizer(example['text'], padding=True, truncation=True),
         batched=True,
         batch_size=64
     )
+
+    return
 
     arguments = TrainingArguments(
         output_dir="models/" + model_name + "/trainer_output",

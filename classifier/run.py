@@ -34,16 +34,15 @@ if __name__ == "__main__":
                 if num_examples > 0:
                     sub_dataset = sample_from_dataset(vanilla_dataset, genre, num_examples)
                     combined_dataset = concatenate_datasets([combined_dataset, sub_dataset])
-            
-
-            filename = "../datagen/generated_data/" + genre + ".csv"
-            generated_df = pd.read_csv(filename)
-            generated_df['genre'] = generated_df['genre'].map(GENRE_ENCODINGS)
-            generated_dataset = Dataset.from_pandas(generated_df)
 
             # add the generated data
             for genre, num_examples in generated_props.items():
                 if num_examples > 0:
+                    filename = "../datagen/generated_data/" + genre + ".csv"
+                    generated_df = pd.read_csv(filename)
+                    generated_df['genre'] = generated_df['genre'].map(GENRE_ENCODINGS)
+                    generated_dataset = Dataset.from_pandas(generated_df)
+
                     sub_dataset = sample_from_dataset(generated_dataset, genre, num_examples)
                     combined_dataset = concatenate_datasets([combined_dataset, sub_dataset])
             
