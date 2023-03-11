@@ -75,6 +75,7 @@ def sample_from_dataset(dataset, genre, num_examples):
         new_sampled_data.dropna(subset=["lyrics"], inplace=True)
         sampled_data = pd.concat([sampled_data, new_sampled_data])
 
+    sampled_data['genre'] = sampled_data['genre'].astype(int)
     return Dataset.from_pandas(sampled_data)
 
 def segment_dataset(dataset):
