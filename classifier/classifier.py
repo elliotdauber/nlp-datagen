@@ -64,9 +64,17 @@ def sample_from_dataset(dataset, n_per_genre):
 
 def sample_from_dataset(dataset, genre, num_examples):
     # sample n_per_genre rows
-    sampled_data = dataset.to_pandas()
-    sampled_data = sampled_data[sampled_data['genre'] == GENRE_ENCODINGS[genre]]
-    sampled_data = sampled_data.sample(n=min(num_examples, len(sampled_data)))
+    all_data = dataset.to_pandas()
+    genre_data = all_data[all_data['genre'] == GENRE_ENCODINGS[genre]]
+
+    sampled_data = pd.DataFrame({'lyrics': [], 'genre': []})
+    while len(sampled_data) < num_examples:
+        curr_len = len(sampled_data)
+        num_left = num_examples - curr_len
+        new_sampled_data = genre_data.sample(n=num_left)
+        new_sampled_data.dropna(subset=["lyrics"], inplace=True)
+        sampled_data = pd.concat([sampled_data, new_sampled_data])
+
     return Dataset.from_pandas(sampled_data)
 
 def segment_dataset(dataset):
@@ -82,15 +90,12 @@ def train_classifier(dataset, model_name):
     tokenizer = AutoTokenizer.from_pretrained('distilbert-base-cased')
     model = DistilBertForSequenceClassification.from_pretrained('distilbert-base-cased', num_labels=len(GENRE_ENCODINGS)).to(device)
 
-    print(split_dataset["train"].features['text'].dtype)
     # Prepare the dataset - this tokenizes the dataset in batches of 64 examples.
     split_tokenized_dataset = split_dataset.map(
         lambda example: tokenizer(example['text'], padding=True, truncation=True),
         batched=True,
         batch_size=64
     )
-
-    return
 
     arguments = TrainingArguments(
         output_dir="models/" + model_name + "/trainer_output",
@@ -122,6 +127,7 @@ def train_classifier(dataset, model_name):
         compute_metrics=compute_metrics
     )
 
+    print(split_tokenized_dataset)
     trainer.train()
 
     model.save_pretrained("models/" + model_name)
