@@ -1,6 +1,7 @@
 from datasets import load_dataset, DatasetDict, Dataset
 from transformers import AutoTokenizer, TrainingArguments, Trainer, DistilBertForSequenceClassification, AdamW, get_linear_schedule_with_warmup
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
 from torch.utils.data import TensorDataset, DataLoader, RandomSampler, SequentialSampler
 import ast
 import numpy as np
@@ -102,9 +103,10 @@ def train_classifier(dataset, model_name):
         output_dir="models/" + model_name + "/trainer_output",
         per_device_train_batch_size=64,
         per_device_eval_batch_size=64,
-        num_train_epochs=10,
-        evaluation_strategy="epoch", # run validation at the end of each epoch
-        save_strategy="epoch",
+        num_train_epochs=200,
+        evaluation_strategy="steps", # run validation at the end of each epoch
+        save_strategy="steps",
+        save_steps=500,
         learning_rate=5e-5,
         load_best_model_at_end=True,
         seed=224
@@ -116,7 +118,7 @@ def train_classifier(dataset, model_name):
         logits, labels = eval_pred
         predictions = np.argmax(logits, axis=-1)
         # calculates the accuracy
-        return {"accuracy": np.mean(predictions == labels)}
+        return {"accuracy": accuracy_score(labels, predictions)}
 
 
     trainer = Trainer(
