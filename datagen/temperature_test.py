@@ -6,7 +6,7 @@ from random import randrange
 import numpy as np
 
 import sys
-sys.path.append('../classifier')  # add the parent directory to the Python path
+sys.path.append('../classifier')  
 from classifier import get_vanilla_dataset, GENRE_DECODINGS
 
 def ask_davinci(question, temp):
